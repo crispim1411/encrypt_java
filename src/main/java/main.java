@@ -1,3 +1,6 @@
+
+import java.security.SecureRandom;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -11,14 +14,19 @@
 public class main {
     public static void main(String[] args) {
         String originalString = "howtodoinjava.com";
-        String secretKey = "macarrao";
+        String password = "macarrao";
      
-        String encryptedString = AES.encrypt(originalString, secretKey) ;
-        String decryptedString = AES.decrypt(encryptedString, secretKey) ;
+        SecureRandom srandom = new SecureRandom();
+        byte[] iv = new byte[16];
+        srandom.nextBytes(iv);
+        
+        String encryptedString = AES.encrypt(originalString, password);
+        String decryptedString = AES.decrypt(encryptedString, password);
 
         System.out.println(originalString);
         System.out.println(encryptedString);
         System.out.println(decryptedString);
+        //System.out.println("iv:"+iv);
     }
     
 }
