@@ -31,18 +31,25 @@ public class AES {
         //SHA256: hash de 256 bits
     //CBC: Cipher Block Chaining
     //PKCS5PaddingPublic: Key Cryptography Standards (Preenche em múltiplos de 8)
+    
+    private final static String ALGORITHM_NAME = "AES/CBC/PKCS5Padding";
+    private final static int ALGORITHM_KEY_SIZE = 256;
+    private final static String PBKDF2_NAME = "PBKDF2WithHmacSHA256";
+    private final static int PBKDF2_SALT_SIZE = 16;
+    private final static int PBKDF2_ITERATIONS = 32767;
+        
     public static String encrypt(String str, String password) {
         try {
             SecureRandom random = new SecureRandom();
-            byte[] salt = new byte[16]; //salt randômico 16 bytes
+            byte[] salt = new byte[PBKDF2_SALT_SIZE]; //salt randômico 16 bytes
             random.nextBytes(salt);
                
-            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-            KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 256);
+            SecretKeyFactory factory = SecretKeyFactory.getInstance(PBKDF2_NAME);
+            KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, PBKDF2_ITERATIONS, ALGORITHM_KEY_SIZE);
             SecretKey tmp = factory.generateSecret(spec);
             SecretKey secret = new SecretKeySpec(tmp.getEncoded(), "AES");
 
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            Cipher cipher = Cipher.getInstance(ALGORITHM_NAME);
             cipher.init(Cipher.ENCRYPT_MODE, secret);
             AlgorithmParameters params = cipher.getParameters();
             byte[] iv = params.getParameterSpec(IvParameterSpec.class).getIV();
@@ -68,12 +75,12 @@ public class AES {
             if (ciphertext.length < 48) {
                 return null;
             }
-            byte[] salt = Arrays.copyOfRange(ciphertext, 0, 16);
-            byte[] iv = Arrays.copyOfRange(ciphertext, 16, 32);
+            byte[] salt = Arrays.copyOfRange(ciphertext, 0, PBKDF2_SALT_SIZE);
+            byte[] iv = Arrays.copyOfRange(ciphertext, PBKDF2_SALT_SIZE, 32);
             byte[] ct = Arrays.copyOfRange(ciphertext, 32, ciphertext.length);
             
-            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-            KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 256);
+            SecretKeyFactory factory = SecretKeyFactory.getInstance(PBKDF2_NAME);
+            KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, PBKDF2_ITERATIONS, ALGORITHM_KEY_SIZE);
             SecretKey tmp = factory.generateSecret(spec);
             SecretKeySpec secret = new SecretKeySpec(tmp.getEncoded(), "AES");
            
