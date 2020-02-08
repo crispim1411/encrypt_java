@@ -15,11 +15,7 @@ public class main {
     public static void main(String[] args) {
         String originalString = "howtodoinjava.com";
         String password = "a1b2cd4e5";
-     
-        SecureRandom srandom = new SecureRandom();
-        byte[] iv = new byte[16];
-        srandom.nextBytes(iv);
-        
+          
         String encryptedString = AES.encrypt(originalString, password);
         String decryptedString = AES.decrypt(encryptedString, password);
 

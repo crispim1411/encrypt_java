@@ -40,6 +40,7 @@ public class AES {
         
     public static String encrypt(String str, String password) {
         try {
+            //Gera salt 16 bytes usando gerador pseudoaleatorio seguro
             SecureRandom random = new SecureRandom();
             byte[] salt = new byte[PBKDF2_SALT_SIZE]; //salt randômico 16 bytes
             random.nextBytes(salt);
