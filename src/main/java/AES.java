@@ -23,28 +23,19 @@ import javax.crypto.spec.SecretKeySpec;
  * @author Rodrigo Crispim
  */
 public class AES {
-    //Encriptação utilizando cifra simétrica por blocos
-    //AES: Advanced Encryption Standard
-    //PBKDF2WithHmacSHA256: 
-        //PBKDF2: Password-Based Key Derivation Function 2
-        //Hmac: Hash-based Message Authentication Code
-        //SHA256: hash de 256 bits
-    //CBC: Cipher Block Chaining
-    //PKCS5PaddingPublic: Key Cryptography Standards (Preenche em múltiplos de 8)
-    
     private final static String ALGORITHM_NAME = "AES/CBC/PKCS5Padding";
     private final static int ALGORITHM_KEY_SIZE = 256;
     private final static String PBKDF2_NAME = "PBKDF2WithHmacSHA256";
     private final static int PBKDF2_SALT_SIZE = 16;
     private final static int PBKDF2_ITERATIONS = 32767;
-        
+
     public static String encrypt(String str, String password) {
         try {
             //salt
             SecureRandom random = new SecureRandom();
-            byte[] salt = new byte[PBKDF2_SALT_SIZE]; 
+            byte[] salt = new byte[PBKDF2_SALT_SIZE];
             random.nextBytes(salt);
-            
+
             //secret key
             SecretKeyFactory factory = SecretKeyFactory.getInstance(PBKDF2_NAME);
             KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, PBKDF2_ITERATIONS, ALGORITHM_KEY_SIZE);
@@ -57,7 +48,7 @@ public class AES {
             AlgorithmParameters params = cipher.getParameters();
             byte[] iv = params.getParameterSpec(IvParameterSpec.class).getIV();
             byte[] encryptedText = cipher.doFinal(str.getBytes("UTF-8"));
-            
+
             //concatenate salt + iv + ciphertext
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             outputStream.write(salt);
@@ -65,15 +56,15 @@ public class AES {
             outputStream.write(encryptedText);
 
             return Base64.getEncoder().encodeToString(outputStream.toByteArray());
-        } 
+        }
         catch (Exception e) {
             System.out.println("Error while encrypting: " + e.toString());
         }
         return "ERROR: Erro ao cifrar";
     }
-    
+
     public static String decrypt(String str, String password) {
-        try {           
+        try {
             //verificaçao
             byte[] ciphertext = Base64.getDecoder().decode(str);
             if (ciphertext.length < 48) {
@@ -83,24 +74,24 @@ public class AES {
             byte[] salt = Arrays.copyOfRange(ciphertext, 0, PBKDF2_SALT_SIZE);
             byte[] iv = Arrays.copyOfRange(ciphertext, PBKDF2_SALT_SIZE, 32);
             byte[] ct = Arrays.copyOfRange(ciphertext, 32, ciphertext.length);
-            
+
             //secret key
             SecretKeyFactory factory = SecretKeyFactory.getInstance(PBKDF2_NAME);
             KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, PBKDF2_ITERATIONS, ALGORITHM_KEY_SIZE);
             SecretKey tmp = factory.generateSecret(spec);
             SecretKeySpec secret = new SecretKeySpec(tmp.getEncoded(), "AES");
-           
+
             //decifra
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
             cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(iv));
             byte[] plaintext = cipher.doFinal(ct);
-            
+
             return new String(plaintext, "UTF-8");
-        } 
+        }
         catch (Exception e) {
             System.out.println("Error while decrypting: " + e.toString());
         }
         return "ERROR: Erro ao decifrar";
     }
-    
+
 }
