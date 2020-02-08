@@ -1,5 +1,8 @@
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.security.AlgorithmParameters;
 import java.security.SecureRandom;
 import java.security.spec.KeySpec;
@@ -20,7 +23,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 /**
  *
- * @author crispim
+ * @author Rodrigo Crispim
  */
 public class AES {
     //Encriptação utilizando cifra simétrica por blocos
@@ -61,20 +64,20 @@ public class AES {
             outputStream.write(salt);
             outputStream.write(iv);
             outputStream.write(encryptedText);
-            
+
             return Base64.getEncoder().encodeToString(outputStream.toByteArray());
         } 
         catch (Exception e) {
             System.out.println("Error while encrypting: " + e.toString());
         }
-        return null;
+        return "ERROR: Erro ao cifrar";
     }
     
     public static String decrypt(String str, String password) {
-        try {
+        try {           
             byte[] ciphertext = Base64.getDecoder().decode(str);
             if (ciphertext.length < 48) {
-                return null;
+                return "ERROR: Erro ao decifrar";
             }
             byte[] salt = Arrays.copyOfRange(ciphertext, 0, PBKDF2_SALT_SIZE);
             byte[] iv = Arrays.copyOfRange(ciphertext, PBKDF2_SALT_SIZE, 32);
@@ -94,7 +97,7 @@ public class AES {
         catch (Exception e) {
             System.out.println("Error while decrypting: " + e.toString());
         }
-        return null;
+        return "ERROR: Erro ao decifrar";
     }
     
 }

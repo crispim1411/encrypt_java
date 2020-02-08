@@ -1,7 +1,12 @@
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.nio.file.Files;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -10,7 +15,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author crispim
+ * @author Rodrigo Crispim
  */
 public class form extends javax.swing.JFrame {
 
@@ -41,6 +46,8 @@ public class form extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
+        loadFile = new javax.swing.JButton();
+        fileChoosen = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -76,24 +83,37 @@ public class form extends javax.swing.JFrame {
             }
         });
 
+        loadFile.setText("Load File");
+        loadFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadFileActionPerformed(evt);
+            }
+        });
+
+        fileChoosen.setText("No selection");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(35, 35, 35)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane1)
-                    .addComponent(jLabel1)
-                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 262, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButton1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(fileChoosen, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(loadFile, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(42, 42, 42)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel3)
                     .addComponent(jLabel2)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 496, Short.MAX_VALUE)
                     .addComponent(jScrollPane3))
-                .addContainerGap(98, Short.MAX_VALUE))
+                .addContainerGap(88, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -109,7 +129,7 @@ public class form extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -117,7 +137,12 @@ public class form extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jButton1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton2)))
+                        .addComponent(jButton2)
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(fileChoosen)
+                            .addComponent(loadFile))
+                        .addGap(4, 4, 4)))
                 .addContainerGap(33, Short.MAX_VALUE))
         );
 
@@ -129,9 +154,13 @@ public class form extends javax.swing.JFrame {
         try {
             String password = passwordText.getText();
             String encryptedString = inputText.getText();
-
+            
+            if (password.length() == 0 || encryptedString.length() == 0) {
+                JOptionPane.showMessageDialog(null, "Parâmetros faltantes");
+                return;
+            }
+            
             String originalString = AES.decrypt(encryptedString, password);
-
             outputText.setText(originalString);
         } catch (Exception e) {
             Logger.getLogger(form.class.getName()).log(Level.SEVERE, null, e);
@@ -143,15 +172,39 @@ public class form extends javax.swing.JFrame {
         try {
             String password = passwordText.getText();
             String str = inputText.getText();
+            
+            if (password.length() == 0 || str.length() == 0) {
+                JOptionPane.showMessageDialog(null, "Parâmetros faltantes");
+                return;
+            }
 
             String encryptedString = AES.encrypt(str, password);
-
             outputText.setText(encryptedString);
+            FileManager.saveContent(encryptedString);
         } catch (Exception e) {
             Logger.getLogger(form.class.getName()).log(Level.SEVERE, null, e);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void loadFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadFileActionPerformed
+        try{
+            JFileChooser openFileChooser = new JFileChooser();
+            String separator = System.getProperty("file.separator");
+            openFileChooser.setCurrentDirectory(new File(System.getProperty("user.home")+separator+"Documents"+separator+"codes"+separator+"crypt_java"+separator+"crypt"));
+            
+            int returnValue = openFileChooser.showOpenDialog(this);
+            if(returnValue == JFileChooser.APPROVE_OPTION){ 
+                File fileToEncrypt = openFileChooser.getSelectedFile();
+                String fileName = fileToEncrypt.getName();
+                fileChoosen.setText(fileName);
+                String content = FileManager.readContent(fileToEncrypt);
+                inputText.setText(content);
+            } 
+        } catch (Exception e){
+            Logger.getLogger(form.class.getName()).log(Level.SEVERE, null, e);
+        }
+    }//GEN-LAST:event_loadFileActionPerformed
+  
     /**
      * @param args the command line arguments
      */
@@ -188,6 +241,7 @@ public class form extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField fileChoosen;
     private javax.swing.JTextArea inputText;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
@@ -197,6 +251,7 @@ public class form extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JButton loadFile;
     private javax.swing.JTextArea outputText;
     private javax.swing.JTextArea passwordText;
     // End of variables declaration//GEN-END:variables
