@@ -2,10 +2,8 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -35,9 +33,9 @@ public class FileManager {
         return null;
     }
     
-    public static void saveContent(String content) {
+    public static void saveContent(String content, String fileName) {
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter("encrypted"));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
             writer.write(content);
             writer.close();
         } catch (Exception e) {

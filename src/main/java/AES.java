@@ -1,8 +1,5 @@
 
-import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.security.AlgorithmParameters;
 import java.security.SecureRandom;
 import java.security.spec.KeySpec;
@@ -43,23 +40,25 @@ public class AES {
         
     public static String encrypt(String str, String password) {
         try {
-            //Gera salt 16 bytes usando gerador pseudoaleatorio seguro
+            //salt
             SecureRandom random = new SecureRandom();
-            byte[] salt = new byte[PBKDF2_SALT_SIZE]; //salt randômico 16 bytes
+            byte[] salt = new byte[PBKDF2_SALT_SIZE]; 
             random.nextBytes(salt);
-               
+            
+            //secret key
             SecretKeyFactory factory = SecretKeyFactory.getInstance(PBKDF2_NAME);
             KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, PBKDF2_ITERATIONS, ALGORITHM_KEY_SIZE);
             SecretKey tmp = factory.generateSecret(spec);
             SecretKey secret = new SecretKeySpec(tmp.getEncoded(), "AES");
 
+            //cifra
             Cipher cipher = Cipher.getInstance(ALGORITHM_NAME);
             cipher.init(Cipher.ENCRYPT_MODE, secret);
             AlgorithmParameters params = cipher.getParameters();
             byte[] iv = params.getParameterSpec(IvParameterSpec.class).getIV();
             byte[] encryptedText = cipher.doFinal(str.getBytes("UTF-8"));
             
-            // concatenate salt + iv + ciphertext
+            //concatenate salt + iv + ciphertext
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             outputStream.write(salt);
             outputStream.write(iv);
@@ -75,19 +74,23 @@ public class AES {
     
     public static String decrypt(String str, String password) {
         try {           
+            //verificaçao
             byte[] ciphertext = Base64.getDecoder().decode(str);
             if (ciphertext.length < 48) {
                 return "ERROR: Erro ao decifrar";
             }
+            //obtém parâmetros
             byte[] salt = Arrays.copyOfRange(ciphertext, 0, PBKDF2_SALT_SIZE);
             byte[] iv = Arrays.copyOfRange(ciphertext, PBKDF2_SALT_SIZE, 32);
             byte[] ct = Arrays.copyOfRange(ciphertext, 32, ciphertext.length);
             
+            //secret key
             SecretKeyFactory factory = SecretKeyFactory.getInstance(PBKDF2_NAME);
             KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, PBKDF2_ITERATIONS, ALGORITHM_KEY_SIZE);
             SecretKey tmp = factory.generateSecret(spec);
             SecretKeySpec secret = new SecretKeySpec(tmp.getEncoded(), "AES");
            
+            //decifra
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
             cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(iv));
             byte[] plaintext = cipher.doFinal(ct);
