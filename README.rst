@@ -2,6 +2,7 @@ Encriptação AES
 ================
 
 Código para encriptação simétrica utilizado Advanced Encryption Standard(AES). Para o processo de encriptação foram utilizados os seguintes modos:
+
 * CBC: Cipher Block Chaining
 * PKCS5PaddingPublic: Key Cryptography Standards 
 * PBKDF2WithHmacSHA256: 
