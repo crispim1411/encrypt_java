@@ -68,7 +68,7 @@ public class AES {
             //verificaçao
             byte[] ciphertext = Base64.getDecoder().decode(str);
             if (ciphertext.length < 48) {
-                return "ERROR: Erro ao decifrar";
+                return "Erro: Dados incompletos para decifrar";
             }
             //obtém parâmetros
             byte[] salt = Arrays.copyOfRange(ciphertext, 0, PBKDF2_SALT_SIZE);
@@ -80,9 +80,9 @@ public class AES {
             KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, PBKDF2_ITERATIONS, ALGORITHM_KEY_SIZE);
             SecretKey tmp = factory.generateSecret(spec);
             SecretKeySpec secret = new SecretKeySpec(tmp.getEncoded(), "AES");
-
+            
             //decifra
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+            Cipher cipher = Cipher.getInstance(ALGORITHM_NAME);
             cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(iv));
             byte[] plaintext = cipher.doFinal(ct);
 
