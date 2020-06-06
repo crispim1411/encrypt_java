@@ -1,6 +1,9 @@
 Encriptação AES
 ================
 
+.. figure:: gui.png
+--------------------
+
 Código para encriptação simétrica utilizado Advanced Encryption Standard(AES). Para o processo de encriptação foram utilizados os seguintes modos:
 
 * CBC: Cipher Block Chaining
